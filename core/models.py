@@ -14,12 +14,34 @@ class HelpDesk:
 
 
     def create(self,ticket):
-        self.tickets.append(ticket)
-    
+        result = self.searchTicket(ticket.id)
+        if result is None:
+            self.tickets.append(ticket)
+            return f"Ticket {ticket.name}added"
+        else:
+            return "ID already added"
+
     def searchTicket(self,id):
         for t in self.tickets:
             if t.id == id:
                 return t 
-        return
+        return 
+    
     def listAll(self):
         return self.tickets
+    
+    def edit(self,ticket):
+        result = self.searchTicket(ticket.id)
+        if isinstance(result,Ticket):
+            result.description = ticket.description
+            result.name = ticket.name
+            result.tech = ticket.tech
+            return f"Modified Ticket {result.id}"
+    
+    def remove(self,ticket):
+        result = self.searchTicket(ticket.id)
+        if isinstance(result,Ticket):
+            self.tickets.remove(result)
+            return f"Removed Ticket {result.id}"
+        else:
+            return "Ticket not found"
