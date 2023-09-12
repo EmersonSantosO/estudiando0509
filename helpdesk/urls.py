@@ -20,10 +20,12 @@ from core import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name='home'),
-    path('createForm/', views.createForm, name='create'),
-    path('add/', views.addTicket, name='add'),
-    path('editForm/', views.editForm, name='edit'),
-    path('edit/', views.editTicket, name='edited'),
+    path('', views.home, name='ticketList'),
+
+    path('add/', views.create_ticket, name='add'),
+    path('edit/<int:id>/', views.edit_ticket, name='edit'),
+
+    path('remove_ticket/<int:id>/', views.remove_ticket, name='remove_ticket'),
+
 ]
 

@@ -1,60 +1,59 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from core.models import Ticket, HelpDesk
 
 h = HelpDesk()
 
 def home(request):
-    return render(request, 'core/ticketList.html', context={'context':h.listAll()})
+    return render(request, 'core/ticketList.html', context={'context':h.list_all()})
 
-def createForm(request):
-    return render(request, 'core/ticketForm.html')
 
-def addTicket(request): 
-    #Capturamos datos desde formulario que se encuentran en request
-    id = request.POST.get('id')
-    name = request.POST.get('name')
-    description = request.POST.get('description')
-    tech = request.POST.get('tech')
+def create_ticket(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        tech = request.POST.get('tech')
 
-    if(id == '' or name.replace(' ', '') == '' or description.strip(' ') == '' or tech == ''):
-        context = {'mensaje':'No se puede agregar un ticket sin datos'}
+        if not (id.strip() and name.strip() and description.strip() and tech.strip()):
+            # Si faltan datos, puedes manejar el error aquí
+            context = {'mensaje': 'No se puede agregar un ticket sin datos'}
+        else:
+            try:
+                h.create_ticket(id, name, description, tech)
+                return redirect('ticketList')  # Redirigir a la lista de tickets
+            except:
+                context = {'mensaje': 'Se ha producido un error'}
+
+    return render(request, 'core/ticketForm.html', context={})
+
+def edit_ticket(request, id):
+    ticket = h.search_ticket(id)
+    
+    if not ticket:
+        error_message = "Ticket no encontrado"
+        return render(request, 'ticketList.html', {'error_message': error_message})
+    
+    if request.method == 'POST':
+        new_name = request.POST.get('new_name')
+        new_description = request.POST.get('new_description')
+        new_tech = request.POST.get('new_tech')
+
+        result = h.edit_ticket(id, new_name, new_description, new_tech)
+        
+        if result:
+            return redirect('ticketList')
+    
+    return render(request, 'edit_ticket.html', {'ticket': ticket})
+def remove_ticket(request, id):
+
+    ticket = h.search_ticket(id)
+
+    if ticket:
+        
+        h.remove_ticket(id)
+        return redirect('ticketList')  
     else:
-        #Instanciamos objeto tipo TICKET 
-        try:
-            t = Ticket(int(id), name, description, tech)
-            #Llamos a nuestro objeto HelpDesk para usar su metodo create
-            #y aniadir un nuevo tick
-            resultado = h.create(t)
-            context = {'mensaje': resultado}
-        except:
-            context = {'mensaje': 'Se ha producido un error'}
-    #Retornamos la vista
-    return render(request, 'core/created.html', context)
-
-def editForm(request):
-    id = int(request.POST.get('id'))
-    ticket = h.searchTicket(id)
-    if ticket is not None:
-        context = {'ticket':ticket}
-    else:
-        context = {}
-    return render(request, 'core/ticketEditForm.html', context)
-
-def editTicket(request):
-    id = request.POST.get('id')
-    name = request.POST.get('name')
-    description = request.POST.get('description')
-    tech = request.POST.get('tech')
-
-    if(id == '' or name.replace(' ', '') == '' or description.strip(' ') == '' or tech == ''):
-        context = {'mensaje':'No se puede agregar un ticket sin datos'}
-    else:
-        try:
-            t = Ticket(int(id), name, description, tech)
-            resultado = h.edit(t)
-            context = {'mensaje': resultado}
-        except:
-            context = {'mensaje': 'Se ha producido un error'}
-    #Retornamos la vista
-    return render(request, 'core/edited.html', context)
+      
+        error_message = "Ticket no encontrado"
+        return render(request, 'ticketList.html', {'error_message': error_message})
 

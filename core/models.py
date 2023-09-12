@@ -15,28 +15,36 @@ class HelpDesk:
 
         self.tickets = [t1, t2]
 
-    def listAll(self):
+    def list_all(self):
         return self.tickets
     
-    def searchTicket(self, id):
-        for t in self.tickets:
-            if id == t.id:
-                return t
-        return #Retorna None
     
-    def create(self, ticket):
-        resultado = self.searchTicket(ticket.id)
-        if resultado is None:
-            self.tickets.append(ticket)
-            return 'Se agrego ticket'
-        return 'Codigo ya existe'
-    
-    def edit(self, ticket):
-        resultado = self.searchTicket(ticket.id)
-        if(isinstance(resultado, Ticket)):
-            resultado.name = ticket.name
-            resultado.description = ticket.description
-            resultado.tech = ticket.tech
-            return 'Se ha modificado ticket'
-        return 'No se ha podido modificar'
+    def create_ticket(self,id, name, description, tech):
+        newTicket = Ticket(id, name, description, tech)
+        self.tickets.append(newTicket)
+        return 
 
+
+            
+    def remove_ticket(self, id):
+        ticket = self.search_ticket(id)
+        if ticket:
+            self.tickets.remove(ticket)
+        else:
+            return "Ticket no encontrado"
+
+    def search_ticket(self, id):
+        for ticket in self.tickets:
+            if ticket.id == id:
+                return ticket
+        return 
+    
+    def edit_ticket(self, id, new_name, new_description, new_tech):      
+        ticket = self.search_ticket(id)     
+        if ticket:
+            ticket.name = new_name
+            ticket.description = new_description
+            ticket.tech = new_tech
+            return f"Ticket {ticket.name} editado correctamente"
+        else:
+            return "Ticket no encontrado"
