@@ -1,0 +1,35 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+
+<h2>Formulario edicion Ticket</h2>
+{% if ticket %}
+<form action="{% url 'edited' %}" method="post">
+    {% csrf_token %}
+    <div class="mx-auto">
+        <input type="number" class="form-control" value="{{ ticket.id }}"
+            name="id" required hidden>
+    </div>
+    <div class="mx-auto">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" value="{{ ticket.name }}"
+            name="name" required>
+    </div>
+    <div class="mx-auto">
+        <label class="form-label">Description</label>
+        <textarea class="form-control" rows="4" cols="50" name="description"
+            required>{{ ticket.description }}</textarea>
+        <div class="mx-auto">
+            <label class="form-label">Tech</label>
+            <input type="text" class="form-control" name="tech"
+                value="{{ ticket.tech }}" required>
+        </div>
+        <div class="form-group mt-5">
+            <button class="btn btn-primary">Create</button>
+            <a class="btn btn-danger" href="{% url 'home' %}">Cancel</a>
+        </div>
+    </form>
+    {% else %}
+    <h3>No se encontro ticket</h3>
+    {% endif %}
+    {% endblock %}
